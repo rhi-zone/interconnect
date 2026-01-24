@@ -2,7 +2,7 @@
 layout: home
 
 hero:
-  name: "Hypha"
+  name: "Interconnect"
   text: "Federation Protocol"
   tagline: "Authoritative handoff for persistent worlds."
   actions:

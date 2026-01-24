@@ -4,13 +4,13 @@ Behavioral rules for Claude Code in this repository.
 
 ## Overview
 
-Hypha is a federation protocol for persistent worlds. It enables Lotus servers to form interconnected networks where players can travel between worlds owned by different authorities.
+Interconnect is a federation protocol for persistent worlds. It enables Lotus servers to form interconnected networks where players can travel between worlds owned by different authorities.
 
 ### Key Concepts
 
 **Authoritative Handoff (Not State Merging)**
 
-Unlike Matrix-style federation that merges state from multiple servers, Hypha uses single-authority ownership:
+Unlike Matrix-style federation that merges state from multiple servers, Interconnect uses single-authority ownership:
 - Each world/room is owned by ONE server at a time
 - When you move between worlds, you disconnect from Server A and connect to Server B
 - No state resolution algorithms, no split-brain attacks, no history rewriting
@@ -118,8 +118,8 @@ Do not:
 
 ## Crate Structure
 
-All crates use the `rhizome-hypha-` prefix:
-- `rhizome-hypha-core` - Protocol types and traits
-- `rhizome-hypha-client` - Client-side implementation
-- `rhizome-hypha-server` - Server-side implementation
-- `rhizome-hypha-substrate` - Substrate caching and replication
+All crates use the `rhi-interconnect-` prefix:
+- `rhi-interconnect-core` - Protocol types and traits
+- `rhi-interconnect-client` - Client-side implementation
+- `rhi-interconnect-server` - Server-side implementation
+- `rhi-interconnect-substrate` - Substrate caching and replication

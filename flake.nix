@@ -1,5 +1,5 @@
 {
-  description = "hypha - federation protocol for persistent worlds";
+  description = "interconnect - federation protocol for persistent worlds";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";

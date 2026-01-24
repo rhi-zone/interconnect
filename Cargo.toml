@@ -6,7 +6,7 @@ members = ["crates/*"]
 version = "0.1.0"
 edition = "2024"
 license = "MIT"
-repository = "https://github.com/rhizome-lab/hypha"
+repository = "https://github.com/rhi-zone/interconnect"
 
 [workspace.dependencies]
-rhizome-hypha-core = { path = "crates/rhizome-hypha-core" }
+rhi-interconnect-core = { path = "crates/rhi-interconnect-core" }

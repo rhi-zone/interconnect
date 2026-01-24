@@ -3,17 +3,17 @@ import { withMermaid } from 'vitepress-plugin-mermaid'
 
 export default withMermaid(
   defineConfig({
-    title: 'Hypha',
+    title: 'Interconnect',
     description: 'Federation protocol for persistent worlds',
 
-    base: '/hypha/',
+    base: '/interconnect/',
 
     themeConfig: {
       nav: [
         { text: 'Guide', link: '/introduction' },
         { text: 'Protocol', link: '/protocol' },
         { text: 'Security', link: '/security' },
-        { text: 'Rhizome', link: 'https://rhizome-lab.github.io/' },
+        { text: 'Rhi', link: 'https://rhi.zone/' },
       ],
 
       sidebar: [
@@ -35,7 +35,7 @@ export default withMermaid(
       ],
 
       socialLinks: [
-        { icon: 'github', link: 'https://github.com/rhizome-lab/hypha' }
+        { icon: 'github', link: 'https://github.com/rhi-zone/interconnect' }
       ],
 
       search: {
@@ -43,7 +43,7 @@ export default withMermaid(
       },
 
       editLink: {
-        pattern: 'https://github.com/rhizome-lab/hypha/edit/master/docs/:path',
+        pattern: 'https://github.com/rhi-zone/interconnect/edit/master/docs/:path',
         text: 'Edit this page on GitHub'
       },
     },

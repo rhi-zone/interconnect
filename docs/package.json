@@ -1,5 +1,5 @@
 {
-  "name": "hypha-docs",
+  "name": "interconnect-docs",
   "private": true,
   "scripts": {
     "dev": "vitepress dev",

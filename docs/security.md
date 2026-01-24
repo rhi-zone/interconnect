@@ -8,25 +8,25 @@ By using authoritative handoff instead of state resolution:
 
 **Matrix Risk**: Inject fake events into the past to change current state.
 
-**Hypha Defense**: Impossible. Clients cannot send state, only intent. Server computes all results.
+**Interconnect Defense**: Impossible. Clients cannot send state, only intent. Server computes all results.
 
 ### Split-Brain Attack
 
 **Matrix Risk**: Partition network, create two realities, merge chaos.
 
-**Hypha Defense**: If Server A goes offline, the world pauses. You can't fork the world because Server A is the only machine with the valid simulation.
+**Interconnect Defense**: If Server A goes offline, the world pauses. You can't fork the world because Server A is the only machine with the valid simulation.
 
 ### State Bloom Attack
 
 **Matrix Risk**: Flood room with metadata updates, replicate everywhere.
 
-**Hypha Defense**: Server doesn't accept state from peers. No replication flood.
+**Interconnect Defense**: Server doesn't accept state from peers. No replication flood.
 
 ### State Resolution DoS
 
 **Matrix Risk**: Craft complex conflicting events to burn CPU resolving "truth".
 
-**Hypha Defense**: No state resolution. One server, one truth.
+**Interconnect Defense**: No state resolution. One server, one truth.
 
 ## Remaining Attack Surface
 

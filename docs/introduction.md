@@ -1,6 +1,6 @@
 # Introduction
 
-Hypha is a federation protocol for persistent worlds, designed for Lotus servers.
+Interconnect is a federation protocol for persistent worlds, designed for Lotus servers.
 
 ## The Problem with State Merging
 
@@ -10,7 +10,7 @@ Traditional federation protocols (like Matrix) try to merge state from multiple 
 - **History Rewriting**: Inject fake events into the past
 - **Split-Brain Attacks**: Partition network, create conflicting realities, merge chaos
 
-## The Hypha Solution
+## The Interconnect Solution
 
 Don't merge. Switch.
 
