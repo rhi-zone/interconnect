@@ -13,7 +13,7 @@ export default withMermaid(
         { text: 'Guide', link: '/introduction' },
         { text: 'Protocol', link: '/protocol' },
         { text: 'Security', link: '/security' },
-        { text: 'Rhi', link: 'https://rhi.zone/' },
+        { text: 'Rhi', link: 'https://docs.rhi.zone/' },
       ],
 
       sidebar: [
