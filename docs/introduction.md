@@ -69,6 +69,8 @@ When you lose connection to the authority:
 
 ## Next Steps
 
+- [Use Cases](/use-cases) - Virtual worlds, social platforms, and more
+- [Design Decisions](/design-decisions) - Architectural choices and rationale
 - [Architecture](/architecture) - Detailed system design
 - [Protocol Reference](/protocol) - Message formats
 - [Security Model](/security) - Attack surface analysis

@@ -11,8 +11,8 @@ export default withMermaid(
     themeConfig: {
       nav: [
         { text: 'Guide', link: '/introduction' },
+        { text: 'Why Interconnect?', link: '/why-interconnect' },
         { text: 'Protocol', link: '/protocol' },
-        { text: 'Security', link: '/security' },
         { text: 'Rhi', link: 'https://docs.rhi.zone/' },
       ],
 
@@ -21,6 +21,9 @@ export default withMermaid(
           text: 'Guide',
           items: [
             { text: 'Introduction', link: '/introduction' },
+            { text: 'Why Interconnect?', link: '/why-interconnect' },
+            { text: 'Use Cases', link: '/use-cases' },
+            { text: 'Design Decisions', link: '/design-decisions' },
             { text: 'Architecture', link: '/architecture' },
           ]
         },
