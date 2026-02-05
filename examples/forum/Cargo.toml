@@ -1,0 +1,16 @@
+[package]
+name = "interconnect-example-forum"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish = false
+
+[dependencies]
+interconnect-core = { path = "../../crates/interconnect-core" }
+anyhow = "1"
+axum = "0.8"
+tokio = { version = "1", features = ["full"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
