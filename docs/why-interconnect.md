@@ -14,6 +14,8 @@ Matrix and ActivityPub require merging state from multiple servers. This means:
 - Dealing with split-brain scenarios
 - Subtle bugs that only appear under network partitions
 
+The Matrix team continues to harden their approach—Project Hydra (2025) patches state reset vulnerabilities and tightens room creation security—but the fixes add complexity to an already complex state resolution algorithm. The underlying challenge of merging state from multiple untrusted sources remains inherent to the model.
+
 Most developers bounce off this complexity. It's not their core competency, and the failure modes are hard to reason about.
 
 **Interconnect's answer:** Authoritative handoff. No merging. Each world/room/space has one authority. When you move, you switch authorities. Simple mental model.

@@ -12,6 +12,8 @@ Architectural choices and their rationale.
 - Split-brain scenarios (partition network, create conflicts, merge chaos)
 - "Delete" doesn't mean delete (copies persist on other servers)
 
+Matrix's Project Hydra (2025) addresses specific vulnerabilities—state resets from delayed federation traffic, room creation event hijacking—by replaying a broader event subgraph during state resolution and cryptographically binding room IDs to creation events. These are real improvements, but they make the state resolution algorithm *more* complex, not simpler. The fundamental attack surface—multiple untrusted servers contributing to shared mutable state—remains inherent to the model.
+
 The alternative—single authority—is simpler and has clear semantics. When the authority is unreachable, you get ghost mode (substrate visible, simulation paused), not corrupted state.
 
 **Tradeoff accepted:** Content availability depends on server availability. This is the same model as traditional websites.
