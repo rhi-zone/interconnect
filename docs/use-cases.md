@@ -1,16 +1,41 @@
 # Use Cases
 
-Interconnect isn't game-specific. The protocol primitives work anywhere you want federation without consensus overhead.
+A room is anything with an authority that accepts connections. The protocol primitives — intent, snapshot, transfer, import policy — work the same regardless of what's inside the room. Interconnect is the connective substrate; what you connect *to* is up to you.
 
 ## Design Goal: Invisible Integration
 
 Adding Interconnect to an existing system should be opt-in and non-invasive:
 
-- **Standalone works fine.** A server that never calls the transfer API is just a normal server.
+- **Standalone works fine.** An authority that never calls the transfer API is just a normal server.
 - **Federation is additive.** You add transfer endpoints; existing logic stays unchanged.
 - **No rewrite required.** If adoption requires rebuilding from scratch, nobody will use it.
 
-The protocol defines how servers hand off users and what data travels with them. What happens inside each server is not Interconnect's concern.
+The protocol defines how authorities hand off clients and what data travels with them. What happens inside each room is not Interconnect's concern.
+
+---
+
+## Processes and Agents
+
+Any running process can be an authority. You send intents, it sends snapshots. The transport between you and the process is interchangeable — terminal, Discord, web UI, whatever you have open.
+
+### Autonomous Agent Steering
+
+An AI coding agent runs on your machine. You want to steer it from your phone.
+
+- The agent is the authority — it owns the room (the running session)
+- Your messages are intents ("change approach", "approve this write", "focus on tests")
+- Agent output is snapshots (progress, questions, results)
+- Discord is just a transport — the agent doesn't know or care how your intent arrived
+
+No custom daemon, no ad-hoc bot wiring. The protocol handles the routing; the transport handles the delivery.
+
+### Build and CI Pipelines
+
+A build process is a room. It emits snapshots (build progress, test results, errors). You send intents (retry, skip, abort). Transfer: when the build finishes, it hands you off to the deploy room with a passport (build artifacts, test report).
+
+### Long-Running Data Jobs
+
+A data pipeline is a room. Snapshots carry progress and intermediate results. Intents let you adjust parameters mid-run. Import policy: the pipeline defines what input shapes it accepts.
 
 ---
 

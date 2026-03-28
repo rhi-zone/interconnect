@@ -2,9 +2,9 @@
 
 What problems does this solve, and for whom?
 
-## Why Don't People Do Federation?
+## Why Don't Things Connect?
 
-Federation is rare outside a few protocols (email, Matrix, ActivityPub). Why?
+Connecting to a remote authority should be simple — intents in, snapshots out. But existing approaches make it hard:
 
 ### State consistency is a nightmare
 
@@ -137,10 +137,11 @@ Being honest about limitations:
 
 Who is Interconnect for?
 
-1. **Indie game devs** who want multiplayer without implementing netcode from scratch
-2. **Self-hosters** who want to run their own social/game servers and connect with friends
-3. **Protocol designers** who want a federation primitive to build on
-4. **Existing platforms** who want to add opt-in federation without rewriting everything
+1. **Anyone running processes they want to reach from wherever they are** — agents, builds, services, personal tools
+2. **Self-hosters** who want to run their own servers and connect with friends
+3. **Indie game devs** who want multiplayer without implementing netcode from scratch
+4. **Protocol designers** who want a federation primitive to build on
+5. **Existing platforms** who want to add opt-in federation without rewriting everything
 
 Who is it *not* for?
 

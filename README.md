@@ -1,47 +1,47 @@
 # Interconnect
 
-Federation protocol for persistent worlds.
+Connective substrate for authoritative rooms.
 
 Part of the [Rhi](https://rhi.zone) ecosystem.
 
 ## Overview
 
-Interconnect enables Lotus servers to form interconnected networks. Players can travel between worlds owned by different authorities without the complexity of distributed state resolution.
+Interconnect is the protocol layer that lets clients connect to authorities. A room is anything with an owner that accepts connections — a game world, a social feed, a running process, an autonomous agent. The protocol defines what a connection is: intents in, snapshots out, authority semantics, explicit boundaries.
+
+Transport-agnostic. The protocol doesn't care how messages move, only what they mean.
 
 ## Key Ideas
 
-### Authoritative Federation
+### Authority over consensus
 
-Unlike Matrix-style federation that tries to merge state from multiple servers, Interconnect uses single-authority ownership:
+Each room is owned by one authority. No state merging, no distributed consensus. When you move between rooms, you disconnect from Authority A and connect to Authority B.
 
-- Each world is owned by ONE server
-- Moving between worlds = disconnect from A, connect to B
-- No split-brain attacks, no state resolution DoS
-
-### Intent-Based Protocol
+### Intent-based protocol
 
 Clients send what they want to do, not what happened:
 
 ```
-Client → Server: RequestMove { direction: North }
-Server → Client: Snapshot { position: (5, 3), tick: 500 }
+Client → Authority: Intent { ... }
+Authority → Client: Snapshot { ... }
 ```
 
-### Two-Layer Architecture
+What intents and snapshots contain is defined by the room. A game room sends movement intents and entity state. An agent room sends steering messages and progress snapshots.
 
-1. **Substrate** - Static world definition. Replicated, cacheable, survives server death.
-2. **Simulation** - Dynamic state. Single authority, ephemeral.
+### Two-layer architecture
 
-When a server goes down, you can still explore the world (substrate). You just can't interact (simulation).
+1. **Substrate** — Static room definition. Replicated, cacheable, survives authority loss.
+2. **Simulation** — Live state. Single authority, ephemeral.
+
+When an authority goes down, the substrate remains (ghost mode). The room pauses, it doesn't disappear.
 
 ## Protocol Primitives
 
 | Primitive | Direction | Purpose |
 |-----------|-----------|---------|
-| Manifest | Server → Client | What this server allows/requires |
-| Intent | Client → Server | Request an action |
-| Snapshot | Server → Client | World state at tick N |
-| Transfer | Server → Client | Handoff to another server |
+| Manifest | Authority → Client | What this room allows/requires |
+| Intent | Client → Authority | Request an action |
+| Snapshot | Authority → Client | Room state at tick N |
+| Transfer | Authority → Client | Handoff to another authority |
 
 ## License
 

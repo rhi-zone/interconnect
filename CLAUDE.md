@@ -4,39 +4,62 @@ Behavioral rules for Claude Code in this repository.
 
 ## Overview
 
-Interconnect is a federation protocol for persistent worlds. It enables Lotus servers to form interconnected networks where players can travel between worlds owned by different authorities.
+Interconnect is a connective substrate — the protocol layer that lets clients connect to authorities. A room is anything with an owner that accepts connections: a game world, a social feed, a running process, an autonomous agent. The protocol defines what a connection is: intents in, snapshots out, authority semantics, explicit boundaries. What happens inside each room is not Interconnect's concern.
+
+### Why This Exists
+
+The deeper motivation: give people rooms that are theirs.
+
+Platforms took away bounded space. Every major social network collapsed contexts — your work self, your family self, your vulnerable self all in one room, performing for the hardest audience simultaneously. Safety requires every person in the room to hold what's shared, and a room of eight billion is never safe.
+
+The internet removed distance. Rooms need walls back.
+
+Interconnect is the substrate that makes connection possible — between you and small spaces owned by someone, connected but not centralized. Nobody owns the network. The substrate is what makes rooms in general possible.
+
+### Transport and Infrastructure
+
+The protocol is transport-agnostic. WebSocket, Unix socket, Discord bot, message queue — the protocol doesn't care how messages move, only what they mean.
+
+One infrastructure option is peer-to-peer with store-and-forward:
+
+- Your PC is the server. The room is online when you're online.
+- Outbound messages wait on the sender's machine until the recipient comes back online.
+- This works because humans are awake ~16 hours/day. Two friends in the same timezone overlap for most of their waking hours. Two friends across the world overlap too — 16h + 16h over 24h means the gap is minimal.
+- The "always-on" assumption is a platform assumption, not a human need.
+
+But P2P is a choice, not a requirement. A room can run on a cloud server, on a machine in your closet, or as a process you started five minutes ago. The protocol works the same way regardless.
 
 ### Key Concepts
 
 **Authoritative Handoff (Not State Merging)**
 
 Unlike Matrix-style federation that merges state from multiple servers, Interconnect uses single-authority ownership:
-- Each world/room is owned by ONE server at a time
-- When you move between worlds, you disconnect from Server A and connect to Server B
+- Each room is owned by ONE authority at a time
+- When you move between rooms, you disconnect from Authority A and connect to Authority B
 - No state resolution algorithms, no split-brain attacks, no history rewriting
 
 **Intent-Based Protocol**
 
 Clients send Intent, not State:
-- Client: "I want to move north" (Intent)
-- Server: "You are now at (5, 3)" (Snapshot)
-- Clients cannot inject state; servers are authoritative
+- Client: "I want to do X" (Intent)
+- Authority: "Here is the current state" (Snapshot)
+- Clients cannot inject state; authorities are authoritative
 
 **Two-Layer Architecture**
 
-1. **Substrate (Replicated)**: Static world definition (geometry, textures, base description). Content-addressable, cacheable everywhere. Survives server death.
-2. **Simulation (Authoritative)**: Dynamic world state (physics, player positions, door states). Single server, not replicated. Pauses when server dies.
+1. **Substrate (Replicated)**: Static room definition (structure, assets, base description). Content-addressable, cacheable everywhere. Survives authority loss.
+2. **Simulation (Authoritative)**: Dynamic room state (live state, interactions, events). Single authority, not replicated. Pauses when authority is lost.
 
 ### Protocol Primitives
 
 - **Manifest**: What this server allows/requires
 - **Intent**: Client requests action
-- **Snapshot**: Server broadcasts world state at tick N
-- **Transfer**: Server hands off player to another server with passport token
+- **Snapshot**: Authority broadcasts room state at tick N
+- **Transfer**: Authority hands off client to another authority with passport token
 
 ### Import Policies (Customs)
 
-When players transfer between servers, their "passport" (inventory, stats) goes through validation:
+When clients transfer between authorities, their "passport" (identity, state, capabilities) goes through validation:
 
 ```rust
 fn on_player_enter(passport: Spore) -> Player {
@@ -54,10 +77,10 @@ fn on_player_enter(passport: Spore) -> Player {
 ### Ghost Mode
 
 When authority connection is lost:
-- World desaturates / shows static effect
-- Player becomes observer (client-side collision only)
-- Can't interact, but world doesn't disappear
-- Substrate (static world) remains visible
+- Client knows authority is unreachable
+- Client becomes observer (read-only access to substrate)
+- Can't interact, but room doesn't disappear
+- Substrate (static definition) remains available
 
 ## Core Rules
 
@@ -94,11 +117,11 @@ From ecosystem-wide session analysis:
 
 ## Design Principles
 
-**Authority over consensus.** Single server owns each world. No state merging, no conflict resolution.
+**Authority over consensus.** Single authority owns each room. No state merging, no conflict resolution.
 
 **Intent over state.** Clients declare intent, servers compute results. Never trust client-provided state.
 
-**Graceful degradation.** When authority dies, fall back to substrate. Static world is better than void.
+**Graceful degradation.** When authority is lost, fall back to substrate. Static content is better than void.
 
 **Explicit import policies.** Each server defines what it accepts from transfers. Contraband is rejected, not silently dropped.
 
@@ -106,7 +129,7 @@ From ecosystem-wide session analysis:
 
 **Batch cargo commands** to minimize round-trips:
 ```bash
-cargo clippy --all-targets --all-features -- -D warnings && cargo test
+cargo clippy --all-targets --all-features -- -D warnings && cargo test -q
 ```
 After editing multiple files, run the full check once — not after each edit. Formatting is handled automatically by the pre-commit hook (`cargo fmt`).
 

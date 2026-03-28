@@ -1,6 +1,6 @@
 # Introduction
 
-Interconnect is a federation protocol for persistent worlds, designed for Lotus servers.
+Interconnect is a connective substrate — the protocol layer that lets clients connect to authorities. A room is anything with an owner that accepts connections: a game world, a social feed, a running process, an autonomous agent. The protocol is transport-agnostic: WebSocket, Unix socket, Discord bot, HTTP — it doesn't care how messages move, only what they mean.
 
 ## The Problem with State Merging
 
@@ -14,58 +14,58 @@ Traditional federation protocols (like Matrix) try to merge state from multiple 
 
 Don't merge. Switch.
 
-- Server A owns the Tavern
-- Server B owns the Dungeon
-- When you're in the Tavern, Server A is God
-- When you move to the Dungeon, you disconnect from A and connect to B
+- Authority A owns Room X
+- Authority B owns Room Y
+- When you're in Room X, Authority A decides what happens
+- When you move to Room Y, you disconnect from A and connect to B
 
-This is **Authoritative Handoff**, not Distributed State.
+**Authority, not consensus.** No state merging, no distributed state.
 
 ## Two-Layer Architecture
 
 ```mermaid
 graph TB
     subgraph "Substrate (Replicated)"
-        G[Geometry]
-        T[Textures]
+        S[Structure]
+        A[Assets]
         D[Base Description]
     end
     subgraph "Simulation (Authoritative)"
-        P[Physics]
-        E[Entity State]
+        L[Live State]
+        E[Events]
         I[Interactions]
     end
-    C[Client] --> G
-    C --> P
+    C[Client] --> S
+    C --> L
 ```
 
 ### Substrate
 
-The static "definition" of the world:
-- Geometry, textures, sounds
-- Base room descriptions
+The static definition of the room:
+- Structure, assets, base description
 - Content-addressable (like IPFS)
 - Cacheable everywhere
-- Survives server death
+- Survives authority loss
+
+What "structure" means depends on the room. For a game: geometry and textures. For a social feed: post history. For an agent: session context and configuration.
 
 ### Simulation
 
-The dynamic "life" of the world:
-- Physics, player positions
-- Door open/closed states
-- Authoritative from single server
+The live state of the room:
+- Current state, active interactions, events
+- Authoritative from single authority
 - Not replicated
-- Pauses when server dies
+- Pauses when authority is lost
 
-## Ghost Mode
+### Ghost Mode
 
 When you lose connection to the authority:
 
-1. World desaturates (visual indicator)
+1. Client knows authority is unreachable
 2. You become an observer
-3. Can walk (client-side collision with substrate)
+3. Substrate remains available (read-only)
 4. Can't interact (no simulation)
-5. World didn't disappear; it paused
+5. Room didn't disappear; it paused
 
 ## Next Steps
 
