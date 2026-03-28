@@ -16,9 +16,13 @@ The internet removed distance. Rooms need walls back.
 
 Interconnect is the substrate that makes connection possible — between you and small spaces owned by someone, connected but not centralized. Nobody owns the network. The substrate is what makes rooms in general possible.
 
+### Multiple Authorities
+
+A client can connect to multiple authorities simultaneously. Discord is an authority (it owns its channels). Your agent is an authority (it owns its session). You're a client connected to both at once. Transfer/handoff between authorities is one pattern, but being in multiple rooms is normal.
+
 ### Transport and Infrastructure
 
-The protocol is transport-agnostic. WebSocket, Unix socket, Discord bot, message queue — the protocol doesn't care how messages move, only what they mean.
+The protocol is transport-agnostic. WebSocket, Unix socket, message queue — the protocol doesn't care how messages move, only what they mean.
 
 One infrastructure option is peer-to-peer with store-and-forward:
 

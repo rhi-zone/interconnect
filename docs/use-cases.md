@@ -16,18 +16,19 @@ The protocol defines how authorities hand off clients and what data travels with
 
 ## Processes and Agents
 
-Any running process can be an authority. You send intents, it sends snapshots. The transport between you and the process is interchangeable — terminal, Discord, web UI, whatever you have open.
+Any running process can be an authority. You send intents, it sends snapshots.
 
 ### Autonomous Agent Steering
 
 An AI coding agent runs on your machine. You want to steer it from your phone.
 
-- The agent is the authority — it owns the room (the running session)
-- Your messages are intents ("change approach", "approve this write", "focus on tests")
+- The agent is an authority — it owns the room (the running session)
+- Discord is an authority — it owns its channels
+- You're a client connected to both simultaneously
+- Your messages in Discord are intents ("change approach", "approve this write", "focus on tests")
 - Agent output is snapshots (progress, questions, results)
-- Discord is just a transport — the agent doesn't know or care how your intent arrived
 
-No custom daemon, no ad-hoc bot wiring. The protocol handles the routing; the transport handles the delivery.
+Both the agent and Discord are authorities. The protocol gives them the same semantics — intents in, snapshots out. You don't need to bridge them through a transport layer; you're just a client in two rooms at once.
 
 ### Build and CI Pipelines
 

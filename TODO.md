@@ -10,21 +10,21 @@ The core protocol types are game-flavored. They need to be domain-agnostic:
 - `Manifest` has `physics_config: PhysicsConfig`, `allowed_items` — should carry room-defined capabilities/requirements
 - Keep game-specific types as one example implementation, not the protocol definition
 
-### Transport trait (2026-03-28)
+### Transport trait (2026-03-29)
 
 Protocol currently assumes WebSocket. Add a `Transport` trait:
 - Protocol layer speaks messages, transport layer moves bytes
 - Implementations: WebSocket, Unix socket, HTTP long-poll, message queue
-- A Discord bot adapter is a transport — the protocol doesn't know or care
+- Note: Discord is NOT a transport — it's a separate authority. Transports are how a client reaches an authority, not how authorities relate to each other.
 
-### Process-as-room spike — agent steering via Discord (2026-03-28)
+### Process-as-room spike — agent steering (2026-03-29)
 
-**This is the immediate use case.** Minimal end-to-end: a running process is a room, reachable from Discord.
-- Authority: wraps a process (initially Claude Code via hooks), accepts intents, emits snapshots
-- Transport: Discord bot adapter — intents arrive as Discord messages, snapshots go back as messages
-- No federation needed for the spike — just one room, one client, one transport
-- Proves the protocol works for something real, today
-- Expand to multi-transport (terminal + Discord simultaneously) as second step
+**This is the immediate use case.** Minimal end-to-end: a running process is a room.
+- The agent is an authority (owns the running session)
+- Discord is a separate authority (owns its channels)
+- You're a client connected to both simultaneously
+- The spike proves: a process can be an interconnect authority, and a client can be in multiple rooms at once
+- Start with Claude Code hooks as the agent-side integration
 
 ### Generalize docs language (2026-03-28)
 
