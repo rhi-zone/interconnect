@@ -758,6 +758,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "interconnect-connector-github"
+version = "0.1.0"
+dependencies = [
+ "interconnect-client",
+ "interconnect-core",
+ "reqwest",
+ "serde",
+ "serde_json",
+ "thiserror 2.0.18",
+ "tokio",
+]
+
+[[package]]
 name = "interconnect-connector-irc"
 version = "0.1.0"
 dependencies = [
@@ -796,6 +809,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "interconnect-connector-signal"
+version = "0.1.0"
+dependencies = [
+ "interconnect-client",
+ "interconnect-core",
+ "serde",
+ "serde_json",
+ "thiserror 2.0.18",
+ "tokio",
+]
+
+[[package]]
 name = "interconnect-connector-slack"
 version = "0.1.0"
 dependencies = [
@@ -812,6 +837,19 @@ dependencies = [
 
 [[package]]
 name = "interconnect-connector-telegram"
+version = "0.1.0"
+dependencies = [
+ "interconnect-client",
+ "interconnect-core",
+ "reqwest",
+ "serde",
+ "serde_json",
+ "thiserror 2.0.18",
+ "tokio",
+]
+
+[[package]]
+name = "interconnect-connector-whatsapp"
 version = "0.1.0"
 dependencies = [
  "interconnect-client",
