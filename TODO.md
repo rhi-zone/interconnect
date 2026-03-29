@@ -74,21 +74,21 @@ Use Matrix bridge implementations as reference for platform quirks.
 9. **IRC** (`interconnect-connector-irc`) ✓ done — plain TCP, RFC 1459.
    `connect(server, port, nick, channel)`. Auto-PONG.
 
-10. **GitHub** (`interconnect-connector-github`) — Issues/PRs/Discussions as
-    rooms. REST API + webhooks. Snapshot = comment thread. Intents: AddComment,
-    React, Close. Prior art: utteranc.es. Reference: matrix-github.
+10. **GitHub** (`interconnect-connector-github`) ✓ done — Issues as rooms.
+    REST API polling (30s). Intents: AddComment, React, CloseIssue.
+    `connect(token, owner, repo, issue_number)`. Prior art: utteranc.es.
 
-11. **WhatsApp** (`interconnect-connector-whatsapp`) — unofficial protocol via
-    `whatsmeow` (Go) or similar Rust port. Reference: mautrix-whatsapp. Risk:
-    account ban policy; implement with care.
+11. **WhatsApp** (`interconnect-connector-whatsapp`) ✓ done — Business Cloud
+    API via Graph API. Send works; recv requires webhook (returns None until
+    implemented). `connect(phone_number_id, access_token, recipient)`.
 
 12. **iMessage** (`interconnect-connector-imessage`) — requires Mac relay
     (BlueBubbles or similar). Reference: matrix-imessage. High setup friction;
     low priority unless relay story improves.
 
-13. **Signal** (`interconnect-connector-signal`) — `signal-cli` subprocess or
-    native Rust via `libsignal`. Reference: mautrix-signal. E2EE complicates
-    snapshot model.
+13. **Signal** (`interconnect-connector-signal`) ✓ done — `signal-cli`
+    subprocess, JSON-RPC over stdio. E2EE transparent.
+    `connect(signal_cli_path, account, recipient)`.
 
 Skip for now:
 - Raw email/IMAP — messy semantics, Zulip + mailing list cover the real needs
