@@ -36,22 +36,20 @@ presents the platform as an Interconnect room. In priority order:
    snapshots, intents → HTTP API calls. `connect(token, channel_id)` returns
    a `DiscordConnection` usable in `tokio::select!` alongside any other room.
 
-2. **Filesystem** (`interconnect-connector-fs`) — local, owned. A watched
-   directory as a room; file changes are snapshots, write intents modify files.
-   Adapters: plaintext, markdown, serde (JSON/TOML/YAML).
+2. **Filesystem** (`interconnect-connector-fs`) ✓ done — inotify watcher,
+   text files as snapshots, WriteFile/DeleteFile intents.
 
-3. **Zulip** (`interconnect-connector-zulip`) — self-hostable, open source,
-   structured (stream + topic). "Your Zulip instance" is a room you own.
+3. **Zulip** (`interconnect-connector-zulip`) ✓ done — HTTP long-poll event
+   queue, stream+topic filtering, rustls.
 
-4. **Mailing list** (`interconnect-connector-maillist`) — one of the oldest
-   owned rooms on the internet. Target: Listmonk API. A list is a room, a
-   thread is part of the snapshot. Self-hosted = yours.
+4. **Mailing list** (`interconnect-connector-maillist`) ✓ done — Listmonk
+   REST API, 30s polling, campaign send intent. 6 tests.
 
-5. **Slack** (`interconnect-connector-slack`) — closed but ubiquitous.
-   Same pattern as Discord, lower priority.
+5. **Slack** (`interconnect-connector-slack`) ✓ done — Socket Mode WebSocket,
+   user display name resolution, ack handling, rustls.
 
 6. **Obsidian** (`interconnect-connector-obsidian`) — FS variant with vault
-   semantics (backlinks, tags). Uses Obsidian's local REST plugin.
+   semantics (backlinks, tags). Uses Obsidian's local REST plugin. Low priority.
 
 Skip for now:
 - Raw email/IMAP — messy semantics, Zulip + mailing list cover the real needs
