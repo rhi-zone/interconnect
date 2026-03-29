@@ -32,8 +32,9 @@ Each platform is a room with its own authority. A connector is a `Transport`
 implementation (plus `Connection::established` for non-native handshakes) that
 presents the platform as an Interconnect room. In priority order:
 
-1. **Discord** (`interconnect-connector-discord`) — immediate use case: steer
-   an agent from Discord. Discord bot gateway → snapshots, intents → API calls.
+1. **Discord** (`interconnect-connector-discord`) ✓ done — gateway events →
+   snapshots, intents → HTTP API calls. `connect(token, channel_id)` returns
+   a `DiscordConnection` usable in `tokio::select!` alongside any other room.
 
 2. **Filesystem** (`interconnect-connector-fs`) — local, owned. A watched
    directory as a room; file changes are snapshots, write intents modify files.
