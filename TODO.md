@@ -95,3 +95,42 @@ Skip for now:
 - Notion — cloud-owned, off-brand
 - RSS — read-only (no intents); trivial but low value
 
+### SQLite connector (`interconnect-connector-sqlite`)
+
+A SQLite table or view as a room. Snapshot = query results. Intents = mutations
+(Insert/Update/Delete or structured ops). Change detection via polling or
+SQLite update hook. Useful as persistent state room for agents — read world
+state, write results back as intents.
+
+### Daemon + Claude Code integration (`interconnect-daemon`)
+
+A persistent daemon that owns long-lived room connections and exposes a
+blocking CLI. Enables `claude -p` to participate in rooms interactively.
+
+**CLI interface:**
+```
+interconnect recv <room>           # block until next unread message
+interconnect recv --nowait <room>  # return pending messages or nothing
+interconnect send <room> <intent>  # send intent to room
+interconnect state <room>          # dump current snapshot
+```
+
+**Daemon responsibilities:**
+- Holds live connections to all configured rooms
+- Tracks a read cursor per room per session (delivers deltas, not full snapshots)
+- Surfaces a Unix socket API that the CLI wraps
+
+**Claude Code hook wiring:**
+- `PreToolUse` / between-turns: `interconnect recv --nowait <room>` — inject
+  any pending messages into context before Claude continues
+- `PostToolUse`: forward tool name + result to room as an event (running log,
+  not just final summary)
+- `Stop`: forward Claude's response to room as an intent
+
+**Env var convention:** hook sets `INTERCONNECT_REPLY_TO=<room>` when waking
+Claude so the `Stop` hook knows where to route the reply.
+
+**Result:** Claude never thinks about routing. It responds; hooks handle
+where input came from and where output goes. `recv --block` for deliberate
+waiting; `recv --nowait` in hooks for ambient message injection.
+
