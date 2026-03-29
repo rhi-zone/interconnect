@@ -8,7 +8,7 @@ Part of the [Rhi](https://rhi.zone) ecosystem.
 
 Interconnect is the protocol layer that lets clients connect to authorities. A room is anything with an owner that accepts connections — a game world, a social feed, a running process, an autonomous agent. The protocol defines what a connection is: intents in, snapshots out, authority semantics, explicit boundaries.
 
-A client can connect to multiple authorities simultaneously. Discord is an authority. Your agent is an authority. You're connected to both.
+A client can be connected to multiple authorities simultaneously. Discord is an authority. Your agent is an authority. You're connected to both.
 
 ## Key Ideas
 

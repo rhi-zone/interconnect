@@ -24,7 +24,7 @@ An AI coding agent runs on your machine. You want to steer it from your phone.
 
 - The agent is an authority — it owns the room (the running session)
 - Discord is an authority — it owns its channels
-- You're a client connected to both simultaneously
+- You can be a client connected to both simultaneously
 - Your messages in Discord are intents ("change approach", "approve this write", "focus on tests")
 - Agent output is snapshots (progress, questions, results)
 

@@ -1,6 +1,6 @@
 # Introduction
 
-Interconnect is a connective substrate — the protocol layer that lets clients connect to authorities. A room is anything with an owner that accepts connections: a game world, a social feed, a running process, an autonomous agent. A client can connect to multiple authorities simultaneously — Discord is an authority, your agent is an authority, you're connected to both.
+Interconnect is a connective substrate — the protocol layer that lets clients connect to authorities. A room is anything with an owner that accepts connections: a game world, a social feed, a running process, an autonomous agent. A client can be connected to multiple authorities simultaneously — Discord is an authority, your agent is an authority, you're connected to both.
 
 ## The Problem with State Merging
 

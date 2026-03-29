@@ -18,7 +18,7 @@ Interconnect is the substrate that makes connection possible — between you and
 
 ### Multiple Authorities
 
-A client can connect to multiple authorities simultaneously. Discord is an authority (it owns its channels). Your agent is an authority (it owns its session). You're a client connected to both at once. Transfer/handoff between authorities is one pattern, but being in multiple rooms is normal.
+A client can be connected to multiple authorities simultaneously. Discord is an authority (it owns its channels). Your agent is an authority (it owns its session). You're a client connected to both at once. Transfer/handoff between authorities is one pattern, but being in multiple rooms is normal.
 
 ### Transport and Infrastructure
 
