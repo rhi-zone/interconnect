@@ -95,12 +95,43 @@ Skip for now:
 - Notion — cloud-owned, off-brand
 - RSS — read-only (no intents); trivial but low value
 
-### SQLite connector (`interconnect-connector-sqlite`)
+### SQLite connector (`interconnect-connector-sqlite`) ✓ done (generic mode)
 
-A SQLite table or view as a room. Snapshot = query results. Intents = mutations
-(Insert/Update/Delete or structured ops). Change detection via polling or
-SQLite update hook. Useful as persistent state room for agents — read world
-state, write results back as intents.
+Two modes:
+
+**Generic mode** (done) — `connect(path, table)`. Any schema, poll for changes
+via `COUNT(*)/MAX(rowid)`. Intents: Execute/Insert/Delete.
+
+**Chat log mode** (TODO) — `connect_chat(path, config)`. Owned schema, manages
+a `messages` table. Each connector maps into it via a user-defined column
+mapping in `interconnect.toml`:
+
+```toml
+[chat_log]
+path = ".interconnect/chat.db"
+
+[chat_log.columns]
+id        = { path = "message.id",          type = "text",    primary_key = true }
+author    = { path = "message.author.name", type = "text" }
+timestamp = { path = "message.timestamp",   type = "integer" }
+guild     = { path = "message.server.id",   type = "text",    nullable = true }
+raw       = { path = "*",                   type = "json" }
+```
+
+- `path` is a dot-path into the snapshot JSON; `"*"` dumps the full platform blob
+- `type`: `text`, `integer`, `real`, `boolean`, `json`, `blob`
+- Missing paths → NULL (requires `nullable = true`)
+- A default `--preset chat` template ships for common chat logging
+
+**Schema design notes:**
+- No single canonical `interconnect-schema` — schema is consumer-defined, not
+  protocol-defined. The protocol is deliberately schema-agnostic.
+- The column mapping DSL should be backend-agnostic. Future connectors
+  (`interconnect-connector-postgres`, `interconnect-connector-duckdb`) reuse
+  the same `interconnect.toml` column config.
+- Platform-specific metadata (Discord embeds, Slack blocks, Matrix event
+  content) goes in the `raw` JSON column — nothing lost, common fields
+  queryable cross-platform.
 
 ### Daemon + Claude Code integration (`interconnect-daemon`)
 
