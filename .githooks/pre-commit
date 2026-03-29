@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 set -e
 
+staged=$(git diff --cached --name-only)
 cargo fmt --all
-git add -u
+if [ -n "$staged" ]; then
+  echo "$staged" | xargs git add
+fi
 cargo clippy --all-targets --all-features -- -D warnings
