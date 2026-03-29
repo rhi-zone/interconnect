@@ -27,9 +27,14 @@
 //! }).await?;
 //! ```
 
+mod chat;
 mod connector;
 mod transport;
 mod types;
 
+pub use chat::{
+    ChatIntent, ChatLogConfig, ColType, ColumnMapping, SqliteChatConnection, SqliteChatSnapshot,
+    connect_chat, extract,
+};
 pub use connector::{SqliteConnection, connect};
 pub use types::{ColumnInfo, SqliteError, SqliteIntent, SqliteSnapshot};
