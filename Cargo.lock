@@ -1149,7 +1149,9 @@ dependencies = [
 name = "interconnect-example-webchat"
 version = "0.1.0"
 dependencies = [
+ "anyhow",
  "axum",
+ "futures-util",
  "interconnect-core",
  "serde",
  "serde_json",
