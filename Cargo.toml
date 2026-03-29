@@ -10,6 +10,7 @@ repository = "https://github.com/rhi-zone/interconnect"
 
 [workspace.dependencies]
 interconnect-core = { path = "crates/interconnect-core" }
+interconnect-daemon = { path = "crates/interconnect-daemon" }
 interconnect-client = { path = "crates/interconnect-client" }
 interconnect-connector-discord = { path = "crates/connectors/discord" }
 interconnect-connector-fs = { path = "crates/connectors/fs" }
