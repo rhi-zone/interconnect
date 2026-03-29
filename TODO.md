@@ -128,9 +128,40 @@ interconnect state <room>          # dump current snapshot
 - `Stop`: forward Claude's response to room as an intent
 
 **Env var convention:** hook sets `INTERCONNECT_REPLY_TO=<room>` when waking
-Claude so the `Stop` hook knows where to route the reply.
+the assistant so the `Stop` hook knows where to route the reply.
 
-**Result:** Claude never thinks about routing. It responds; hooks handle
+**Result:** The assistant never thinks about routing. It responds; hooks handle
 where input came from and where output goes. `recv --block` for deliberate
 waiting; `recv --nowait` in hooks for ambient message injection.
+
+**Tool-agnostic by design.** The daemon knows nothing about Claude, Gemini,
+Cursor, etc. Hook wiring is declared in `interconnect.toml`:
+
+```toml
+[[room]]
+name = "work-chat"
+connector = "slack"
+channel = "C1234567890"
+
+[[room]]
+name = "session"
+connector = "sqlite"
+path = ".interconnect/session.db"
+
+[[hook]]
+event = "post_tool_use"
+send_to = "session"
+
+[[hook]]
+event = "stop"
+send_to = "work-chat"
+reply_from = "work-chat"
+```
+
+`interconnect init --preset claude` reads `interconnect.toml` and emits the
+corresponding `.claude/settings.json` hook entries. Presets are templates —
+one per tool (Claude Code, Gemini CLI, Cursor, OpenCode, etc.). Community can
+add presets without touching daemon code. The hook interface (`PostToolUse`,
+`UserPromptSubmit`, `PreCompact`, `SessionStart`) is converging across all
+major AI coding tools.
 
