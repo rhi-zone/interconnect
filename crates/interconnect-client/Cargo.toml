@@ -1,0 +1,16 @@
+[package]
+name = "interconnect-client"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Client-side implementation for the Interconnect protocol"
+
+[dependencies]
+interconnect-core = { path = "../interconnect-core" }
+tokio = { version = "1", features = ["net"] }
+tokio-tungstenite = "0.26"
+futures-util = "0.3"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+thiserror = "2"

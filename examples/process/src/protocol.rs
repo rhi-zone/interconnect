@@ -40,6 +40,7 @@ pub struct ProcessSnapshot {
 
 /// Passport for clients transferring between process rooms.
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[allow(dead_code)] // constructed by the server authority, not client-side
 pub struct ProcessPassport {
     pub name: String,
     pub origin: String,
