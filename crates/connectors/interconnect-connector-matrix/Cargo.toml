@@ -1,0 +1,16 @@
+[package]
+name = "interconnect-connector-matrix"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Matrix connector for the Interconnect protocol"
+
+[dependencies]
+interconnect-core.workspace = true
+interconnect-client.workspace = true
+reqwest = { version = "0.12", features = ["json", "rustls-tls"], default-features = false }
+tokio = { version = "1", features = ["net"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+thiserror = "2"

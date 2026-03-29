@@ -16,6 +16,9 @@ interconnect-connector-fs = { path = "crates/connectors/fs" }
 interconnect-connector-zulip = { path = "crates/connectors/zulip" }
 interconnect-connector-slack = { path = "crates/connectors/slack" }
 interconnect-connector-maillist = { path = "crates/connectors/maillist" }
+interconnect-connector-irc = { path = "crates/connectors/interconnect-connector-irc" }
+interconnect-connector-telegram = { path = "crates/connectors/interconnect-connector-telegram" }
+interconnect-connector-matrix = { path = "crates/connectors/interconnect-connector-matrix" }
 
 [profile.dev]
 debug = 0
