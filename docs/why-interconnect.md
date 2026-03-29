@@ -18,7 +18,7 @@ The Matrix team continues to harden their approach—Project Hydra (2025) patche
 
 Most developers bounce off this complexity. It's not their core competency, and the failure modes are hard to reason about.
 
-**Interconnect's answer:** Authoritative handoff. No merging. Each world/room/space has one authority. When you move, you switch authorities. Simple mental model.
+**Interconnect's answer:** Authoritative handoff. No merging. Each room has one authority. When you move, you switch authorities. Simple mental model.
 
 ### Trust is undefined
 
@@ -30,7 +30,7 @@ When you federate, you have to decide:
 
 Most protocols leave this vague, leading to blocklists, allowlists, and ad-hoc policies.
 
-**Interconnect's answer:** Explicit import policies. Each server declares what it accepts. Contraband is rejected at the border, not silently dropped or merged.
+**Interconnect's answer:** Explicit import policies. Each authority declares what it accepts. Contraband is rejected at the border, not silently dropped or merged.
 
 ### Identity is a whole thing
 
@@ -52,7 +52,7 @@ To test federation, you need multiple servers running. Local development becomes
 - Configure them to know about each other
 - Hope your machine can run both
 
-**Interconnect's answer:** Single-process testing mode. Run multiple "servers" in one process with `local:` identity. No network setup for basic testing.
+**Interconnect's answer:** Single-process testing mode. Run multiple "authorities" in one process with `local:` identity. No network setup for basic testing.
 
 ### Libraries are incomplete
 
@@ -68,39 +68,38 @@ Federation works against lock-in. Most platforms profit from lock-in.
 
 ---
 
-## Why Is Netcode Hard?
+## Why Is Authoritative Connection Hard?
 
-Even without federation, multiplayer networking is notoriously difficult.
+Even without federation, connecting to a live authority has known hard problems.
 
 ### Latency is physics
 
 Speed of light is 3ms per 1000km. Cross-continental round trips are 50-150ms minimum. You can't fix this with code.
 
-Mitigation requires:
+For real-time rooms (games, live collaboration, agent steering), mitigation requires:
 - Client-side prediction
-- Server reconciliation
+- Authority reconciliation
 - Interpolation and extrapolation
-- Rollback for competitive games
 
-**Interconnect's answer:** Partial. We provide the snapshot/intent model which supports these patterns, but implementing prediction/rollback is still your job. We handle the transport; you handle the game feel.
+**Interconnect's answer:** Partial. We provide the snapshot/intent model which supports these patterns, but implementing prediction/rollback for your specific room is still your job. We handle the transport; you handle the feel.
 
 ### Bandwidth adds up
 
-Sending full world state every frame doesn't scale. You need:
+Sending full room state every tick doesn't scale. You need:
 - Delta compression (only send changes)
-- Relevancy filtering (only send what this client can see)
+- Relevancy filtering (only send what this client needs)
 - Priority systems (important updates first)
 
-**Interconnect's answer:** Snapshot structure supports deltas. Relevancy and priority are application-level - you generate the snapshot, you decide what's in it.
+**Interconnect's answer:** Snapshot structure supports deltas. Relevancy and priority are application-level — you generate the snapshot, you decide what's in it.
 
 ### Clients lie
 
-Any competitive game must assume clients are malicious:
-- Aim assists, wall hacks, speed hacks
+Any room where clients compete or have incentives to cheat must assume clients are malicious:
 - Modified clients sending impossible inputs
 - Packet manipulation
+- Fabricated state claims
 
-**Interconnect's answer:** Intent-based protocol. Clients send intent ("I want to move north"), servers compute results. Clients cannot declare state. This doesn't prevent all cheats (aimbots still work) but eliminates state injection.
+**Interconnect's answer:** Intent-based protocol. Clients send intent ("I want to do X"), authorities compute results. Clients cannot declare state. This doesn't prevent all abusive behavior (bots, social manipulation) but eliminates state injection.
 
 ### Connection chaos
 
@@ -115,7 +114,7 @@ Real networks have:
 
 ### Everyone builds from scratch
 
-There's no "Rails for multiplayer." Every studio implements their own netcode, often poorly, often from scratch.
+There's no standard library for authoritative room connections. Every project implements their own connection management, often poorly, often from scratch — whether they're building a game, an agent controller, or a federated social platform.
 
 **Interconnect's answer:** This is the goal. Bring your types (Intent, Snapshot, Passport), we handle the machinery. Whether we achieve "just use this" remains to be seen - the spike will tell us.
 
@@ -125,7 +124,7 @@ There's no "Rails for multiplayer." Every studio implements their own netcode, o
 
 Being honest about limitations:
 
-- **Latency** - Physics. Use prediction/rollback patterns.
+- **Latency** - Physics. Use prediction/rollback patterns for real-time rooms.
 - **NAT traversal** - Use WebRTC, TURN servers, or relay infrastructure.
 - **Content moderation at scale** - Still a human/policy problem.
 - **Adoption chicken-and-egg** - Federation only matters when others federate.

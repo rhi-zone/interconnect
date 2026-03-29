@@ -11,10 +11,10 @@ CONNECTING → LOADING_SUBSTRATE → SYNCING → LIVE → GHOST
 | State | Description |
 |-------|-------------|
 | CONNECTING | Establishing WebSocket connection |
-| LOADING_SUBSTRATE | Fetching/verifying static world data |
+| LOADING_SUBSTRATE | Fetching/verifying static room data |
 | SYNCING | Receiving initial snapshot |
-| LIVE | Normal gameplay, sending intent, receiving snapshots |
-| GHOST | Authority lost, substrate-only exploration |
+| LIVE | Normal operation, sending intent, receiving snapshots |
+| GHOST | Authority lost, substrate-only access |
 
 ## Message Formats
 
@@ -26,7 +26,7 @@ All messages are encoded as MessagePack.
 enum ClientMessage {
     Intent(Intent),
     AckSnapshot { tick: u64 },
-    RequestTransfer { destination: WorldId },
+    RequestTransfer { destination: RoomId },
 }
 ```
 
@@ -43,25 +43,24 @@ enum ServerMessage {
 
 ## Intent Types
 
+Intents are application-defined — the protocol carries them as opaque bytes. Common patterns:
+
 ```rust
 enum Intent {
-    // Movement
-    Move { direction: Vec2, sprint: bool },
-    Teleport { position: Vec3 },  // May be rejected
-
-    // Interaction
-    Interact { target: EntityId, action: ActionId },
-    UseItem { slot: usize, target: Option<EntityId> },
+    // Actions — what the client wants to do
+    Perform { action: ActionId, target: Option<TargetId> },
 
     // Communication
-    Chat { channel: Channel, message: String },
+    Send { channel: Channel, message: String },
     Emote { emote: EmoteId },
 
-    // World
-    PlaceObject { prefab: PrefabId, position: Vec3 },
-    ModifyObject { target: EntityId, modification: Modification },
+    // Room modification
+    Place { object: ObjectRef, location: Location },
+    Modify { target: ObjectId, modification: Modification },
 }
 ```
+
+For a game, intents might include `Move { direction: Vec2 }` or `UseItem { slot: usize }`. For a social room, intents might include `Post { content: String }` or `React { target: PostId, reaction: ReactionId }`. For a process room, intents might include `Abort`, `Retry`, or `AdjustParameter { key: String, value: Value }`.
 
 ## Snapshot Structure
 
@@ -71,27 +70,27 @@ struct Snapshot {
     timestamp: Instant,
 
     // Delta from last acknowledged snapshot
-    entities_added: Vec<Entity>,
-    entities_removed: Vec<EntityId>,
-    entities_changed: Vec<(EntityId, ComponentDelta)>,
+    entries_added: Vec<StateEntry>,
+    entries_removed: Vec<EntryId>,
+    entries_changed: Vec<(EntryId, EntryDelta)>,
 
     // Events since last snapshot
-    events: Vec<WorldEvent>,
+    events: Vec<RoomEvent>,
 }
 ```
 
 ## Transfer Protocol
 
-When crossing world boundaries:
+When crossing room boundaries:
 
 1. Client sends `RequestTransfer { destination }`
-2. Server validates (can player leave? does destination exist?)
-3. Server sends `Transfer { destination, passport, signature }`
-4. Client disconnects from current server
+2. Authority validates (can client leave? does destination exist?)
+3. Authority sends `Transfer { destination, passport, signature }`
+4. Client disconnects from current authority
 5. Client connects to destination with passport
 6. Destination validates passport signature
 7. Destination applies import policy
-8. Player enters new world
+8. Client enters new room
 
 ## Availability States
 

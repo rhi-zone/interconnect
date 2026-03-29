@@ -1,103 +1,113 @@
 # Import Policies
 
-When players transfer between worlds, their data passes through customs.
+When clients transfer between rooms, their data passes through customs.
 
 ## The Problem
 
-Player brings a passport: `{ health: 999999, items: ["GodSword", "AdminKey"] }`
+A client brings a passport: `{ role: "admin", items: ["GodSword", "AdminKey"], credits: 999999 }`
 
 Do you trust it?
 
 ## The Solution
 
-Each server defines an **Import Policy** that sanitizes incoming player data.
+Each authority defines an **Import Policy** that validates and sanitizes incoming client data.
 
 ## Policy Definition
 
 ```rust
 struct ImportPolicy {
-    // Stats
-    max_health: u32,
-    max_level: u32,
+    // Identity
+    preserve_identity: bool,
 
-    // Inventory
+    // Capabilities and roles
+    allowed_roles: HashSet<RoleId>,
+    banned_capabilities: HashSet<CapabilityId>,
+
+    // Carried items or assets (application-defined)
     allowed_items: HashSet<ItemId>,
     banned_items: HashSet<ItemId>,
-    max_inventory_size: usize,
+    max_carried_items: usize,
 
-    // Abilities
-    allowed_abilities: HashSet<AbilityId>,
-
-    // Currency
-    max_currency: u64,
-    currency_conversion: Option<ConversionRate>,
+    // Numeric fields: clamp to local limits
+    field_limits: HashMap<String, RangeLimit>,
 }
 ```
 
 ## Validation Flow
 
 ```rust
-fn validate_passport(passport: Passport, policy: &ImportPolicy) -> ValidatedPlayer {
-    let mut player = ValidatedPlayer::new();
+fn validate_passport(passport: Passport, policy: &ImportPolicy) -> ValidatedClient {
+    let mut client = ValidatedClient::new();
 
-    // Stats: clamp to policy limits
-    player.health = passport.health.min(policy.max_health);
-    player.level = passport.level.min(policy.max_level);
+    // Numeric fields: clamp to policy limits
+    for (field, limit) in &policy.field_limits {
+        if let Some(value) = passport.get_field(field) {
+            client.set_field(field, value.clamp(limit.min, limit.max));
+        }
+    }
 
-    // Items: filter against whitelist/blacklist
-    for item in passport.items.iter().take(policy.max_inventory_size) {
+    // Items: filter against allowlist/blocklist
+    for item in passport.items.iter().take(policy.max_carried_items) {
         if policy.banned_items.contains(&item.id) {
-            player.add_notification(format!("Banned item confiscated: {}", item.name));
+            client.add_notification(format!("Banned item confiscated: {}", item.name));
             continue;
         }
 
         if policy.allowed_items.is_empty() || policy.allowed_items.contains(&item.id) {
-            player.inventory.push(item.clone());
+            client.carry.push(item.clone());
         } else {
-            player.add_notification(format!("Item not recognized: {}", item.name));
+            client.add_notification(format!("Item not recognized: {}", item.name));
         }
     }
 
-    player
+    client
 }
 ```
 
 ## Policy Examples
 
-### Open World (Permissive)
+### Open Room (Permissive)
+
+Accepts most incoming data, blocks known contraband:
 
 ```toml
 [import_policy]
-max_health = 1000
 allowed_items = "*"  # All items allowed
 banned_items = ["debug_tool", "admin_key"]
 ```
 
-### PvP Arena (Restrictive)
+### Restricted Room (Filtered)
+
+Accepts only specific capabilities and items:
 
 ```toml
 [import_policy]
-max_health = 100
-max_level = 50
-allowed_items = ["sword", "shield", "potion"]
-max_inventory_size = 10
+allowed_roles = ["member"]
+allowed_items = ["avatar", "display_name"]
+max_carried_items = 5
 ```
 
-### Tutorial Zone (Fresh Start)
+For a game, this might be a PvP arena that only allows basic gear. For a social room, this might be a community that imports your identity but ignores reputation from other platforms.
+
+### Fresh-Start Room
+
+Accepts identity but ignores all other incoming state:
 
 ```toml
 [import_policy]
 preserve_identity = true  # Keep name/appearance
-reset_stats = true        # Ignore incoming stats
+reset_stats = true        # Ignore incoming numeric fields
 reset_inventory = true    # Ignore incoming items
 ```
 
+For a game, this is a tutorial zone or permadeath server. For a professional network, this is a space that accepts your identity but not your social history from other communities.
+
 ## Notifications
 
-When items are confiscated or stats are adjusted, players receive notifications:
+When data is adjusted or items confiscated, clients receive notifications:
 
-- "Your health was adjusted from 999 to 100 (server limit)"
-- "Item 'GodSword' is not allowed in this realm"
+- "Your 'credits' field was adjusted from 999999 to 1000 (server limit)"
+- "Item 'GodSword' is not allowed in this room"
 - "Contraband detected: 'AdminKey' confiscated"
 
 Transparency builds trust. Never silently drop data.

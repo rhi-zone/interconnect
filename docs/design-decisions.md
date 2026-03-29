@@ -180,13 +180,17 @@ struct MyPassport { username: String, inventory: Vec<Item>, stats: Stats }
 
 **Rationale:** Clients can lie, be buggy, or be malicious. The server is the source of truth. Clients express what they want; servers decide what happens.
 
-**Example:**
+**Examples:**
 ```
 // Client sends
-Intent::Move { direction: North }
+Intent::Move { direction: North }           // game: movement request
+Intent::Post { content: "hello" }           // social: post request
+Intent::Adjust { param: "threshold", value: 0.8 } // pipeline: parameter change
 
-// Server responds (in next snapshot)
-Snapshot { player_position: (5, 3), ... }
+// Authority responds (in next snapshot)
+Snapshot { position: (5, 3), ... }          // game: new position
+Snapshot { posts: [...], ... }              // social: updated feed
+Snapshot { progress: 0.42, status: Running } // pipeline: current state
 
-// NOT: Client sends "I am now at (5, 3)"
+// NOT: Client sends "I am now at (5, 3)" or "my post is now live"
 ```

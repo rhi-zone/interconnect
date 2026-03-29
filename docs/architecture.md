@@ -5,20 +5,20 @@
 ```mermaid
 sequenceDiagram
     participant C as Client
-    participant A as Server A (Tavern)
-    participant B as Server B (Dungeon)
+    participant A as Authority A (Room A)
+    participant B as Authority B (Room B)
 
     C->>A: Connect
     A->>C: Manifest (rules, assets)
     A->>C: Snapshot (tick 1)
 
-    loop Gameplay
-        C->>A: Intent (move north)
+    loop Session
+        C->>A: Intent (action)
         A->>C: Snapshot (tick N)
     end
 
-    C->>A: Intent (enter dungeon portal)
-    A->>C: Transfer (Server B, passport token)
+    C->>A: Intent (request transfer)
+    A->>C: Transfer (Authority B, passport token)
 
     C->>B: Connect (passport token)
     B->>C: Manifest
@@ -29,14 +29,13 @@ sequenceDiagram
 
 ### Manifest
 
-Sent by server on connection. Describes what this world allows:
+Sent by authority on connection. Describes what this room allows:
 
 ```rust
 struct Manifest {
-    world_id: WorldId,
-    substrate_hash: Hash,      // Content address of static world
-    allowed_items: Vec<ItemId>,
-    physics_config: PhysicsConfig,
+    room_id: RoomId,
+    substrate_hash: Hash,      // Content address of static room definition
+    capabilities: Vec<CapabilityId>,
     asset_requirements: Vec<AssetRef>,
 }
 ```
@@ -47,32 +46,32 @@ Client requests an action:
 
 ```rust
 enum Intent {
-    Move { direction: Direction },
-    Interact { target: EntityId },
-    UseItem { item: ItemId, target: Option<EntityId> },
-    Chat { message: String },
+    // Examples — your application defines what intents exist
+    Perform { action: ActionId, target: Option<TargetId> },
+    Send { channel: ChannelId, message: String },
+    // Application-specific intents are opaque bytes to the protocol
 }
 ```
 
 ### Snapshot
 
-Server broadcasts authoritative state:
+Authority broadcasts authoritative state:
 
 ```rust
 struct Snapshot {
     tick: u64,
-    entities: Vec<EntityState>,
-    events: Vec<WorldEvent>,
+    state: Vec<StateEntry>,
+    events: Vec<RoomEvent>,
 }
 ```
 
 ### Transfer
 
-Server hands off client to another server:
+Authority hands off client to another authority:
 
 ```rust
 struct Transfer {
-    destination: ServerAddress,
+    destination: AuthorityAddress,
     passport: Passport,
     signature: Signature,
 }
@@ -82,19 +81,19 @@ struct Transfer {
 
 Substrates are content-addressed and aggressively cached:
 
-1. Client connects to Server A
-2. Server sends `substrate_hash`
+1. Client connects to Authority A
+2. Authority sends `substrate_hash`
 3. Client checks local cache
-4. If miss, fetches from server or P2P
+4. If miss, fetches from authority or P2P
 5. Verifies hash
 
-When Server A dies, client still has substrate locally.
+When Authority A dies, client still has substrate locally.
 
 ## Heartbeat Snapshots
 
-Servers periodically export simulation state as new substrate versions:
+Authorities periodically export simulation state as new substrate versions:
 
-1. Every N minutes, export "state of the world"
+1. Every N minutes, export "state of the room"
 2. Push to replication layer (IPFS, S3, P2P mesh)
-3. If server crashes, reconnecting clients load latest snapshot
+3. If authority crashes, reconnecting clients load latest snapshot
 4. User-created changes persist (as static objects)
