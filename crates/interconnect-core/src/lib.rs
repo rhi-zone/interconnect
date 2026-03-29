@@ -38,12 +38,14 @@ mod authority;
 mod identity;
 mod message;
 mod transfer;
+mod transport;
 mod wire;
 
 pub use authority::{Authority, ImportResult, Rejection, Session, SimpleAuthority};
 pub use identity::Identity;
 pub use message::{ClientMessage, ServerMessage};
 pub use transfer::{Passport, Transfer};
+pub use transport::Transport;
 pub use wire::{from_json, from_json_str, to_json, to_json_string, ClientWire, ServerWire, Wire};
 
 use serde::{Deserialize, Serialize};
