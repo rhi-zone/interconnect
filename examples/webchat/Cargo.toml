@@ -1,0 +1,22 @@
+[package]
+name = "interconnect-example-webchat"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish = false
+
+[[bin]]
+name = "webchat-server"
+path = "src/main.rs"
+
+[dependencies]
+interconnect-core = { path = "../../crates/interconnect-core" }
+axum = { version = "0.8", features = ["ws"] }
+tokio = { version = "1", features = ["full"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+tower = "0.5"
+futures-util = "0.3"
+anyhow = "1"
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
