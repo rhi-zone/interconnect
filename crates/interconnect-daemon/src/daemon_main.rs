@@ -1,6 +1,7 @@
 mod config;
 mod daemon;
 mod protocol;
+mod room;
 
 use std::path::PathBuf;
 

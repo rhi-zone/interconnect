@@ -22,3 +22,16 @@ toml = "0.8"
 thiserror = "2"
 anyhow = "1"
 clap = { version = "4", features = ["derive", "env"] }
+interconnect-core.workspace = true
+interconnect-connector-slack.workspace = true
+interconnect-connector-discord.workspace = true
+interconnect-connector-sqlite.workspace = true
+interconnect-connector-telegram.workspace = true
+interconnect-connector-matrix.workspace = true
+interconnect-connector-irc.workspace = true
+interconnect-connector-zulip.workspace = true
+interconnect-connector-maillist.workspace = true
+interconnect-connector-signal.workspace = true
+interconnect-connector-github.workspace = true
+interconnect-connector-whatsapp.workspace = true
+interconnect-connector-fs.workspace = true

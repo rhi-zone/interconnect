@@ -73,7 +73,7 @@ impl SqliteTransport {
 
     pub(crate) fn current_snapshot(
         conn: &rusqlite::Connection,
-        path: &PathBuf,
+        path: &std::path::Path,
         table: &str,
         schema: &[ColumnInfo],
     ) -> Result<SqliteSnapshot, SqliteError> {

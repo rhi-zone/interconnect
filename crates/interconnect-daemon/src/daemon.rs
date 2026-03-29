@@ -3,10 +3,11 @@ use std::path::PathBuf;
 use std::sync::Arc;
 use tokio::io::{AsyncBufReadExt, AsyncWriteExt, BufReader};
 use tokio::net::{UnixListener, UnixStream};
-use tokio::sync::{Mutex, Notify};
+use tokio::sync::{Mutex, Notify, mpsc};
 
 use crate::config::{Config, RoomConfig};
 use crate::protocol::{Request, Response};
+use crate::room::{RoomHandle, spawn_room};
 
 /// Per-room state managed by the daemon.
 struct RoomState {
@@ -17,6 +18,9 @@ struct RoomState {
     cursor: usize,
     /// Notified whenever a new message is appended.
     notify: Arc<Notify>,
+    /// Handle for sending intents to the connector task. `None` until the
+    /// connector has been successfully spawned.
+    handle: Option<RoomHandle>,
 }
 
 impl RoomState {
@@ -26,6 +30,7 @@ impl RoomState {
             messages: Vec::new(),
             cursor: 0,
             notify: Arc::new(Notify::new()),
+            handle: None,
         }
     }
 
@@ -91,16 +96,51 @@ impl Daemon {
             self.socket_path.display()
         );
 
-        // Spawn stub message producers for each room.
-        // TODO: Replace with real connector instantiation once connectors expose a
-        // uniform async connect() interface. Each connector would call push() via
-        // a channel or shared state rather than a timer.
+        // Spawn real connector tasks for each configured room.
         {
             let rooms = Arc::clone(&self.rooms);
-            let names: Vec<String> = rooms.lock().await.keys().cloned().collect();
-            for name in names {
+            let configs: Vec<RoomConfig> = rooms
+                .lock()
+                .await
+                .values()
+                .map(|s| s.config.clone())
+                .collect();
+
+            for cfg in configs {
                 let rooms = Arc::clone(&rooms);
-                tokio::spawn(stub_producer(rooms, name));
+                let room_name = cfg.name.clone();
+
+                // Channel for the connector task to push snapshots back to the daemon.
+                let (push_tx, mut push_rx) = mpsc::unbounded_channel::<serde_json::Value>();
+
+                match spawn_room(&cfg, push_tx).await {
+                    Ok(handle) => {
+                        // Store the handle so Send requests can forward intents.
+                        {
+                            let mut guard = rooms.lock().await;
+                            if let Some(state) = guard.get_mut(&room_name) {
+                                state.handle = Some(handle);
+                            }
+                        }
+
+                        // Drain incoming snapshots from the connector into room state.
+                        tokio::spawn(async move {
+                            while let Some(msg) = push_rx.recv().await {
+                                let mut guard = rooms.lock().await;
+                                if let Some(state) = guard.get_mut(&room_name) {
+                                    state.push(msg);
+                                } else {
+                                    break;
+                                }
+                            }
+                        });
+                    }
+                    Err(e) => {
+                        eprintln!(
+                            "interconnect-daemon: failed to start connector for room '{room_name}': {e}"
+                        );
+                    }
+                }
             }
         }
 
@@ -108,29 +148,6 @@ impl Daemon {
             let (stream, _addr) = listener.accept().await?;
             let rooms = Arc::clone(&self.rooms);
             tokio::spawn(handle_connection(stream, rooms));
-        }
-    }
-}
-
-/// Stub: periodically pushes a synthetic message into a room so the daemon can
-/// be exercised without real connectors.
-///
-/// TODO: Remove once connectors are wired in. Replace with a real connector
-/// task that drives push() from live data.
-async fn stub_producer(rooms: SharedRooms, room_name: String) {
-    let mut counter: u64 = 0;
-    loop {
-        tokio::time::sleep(tokio::time::Duration::from_secs(5)).await;
-        counter += 1;
-        let msg = serde_json::json!({
-            "stub": true,
-            "room": room_name,
-            "seq": counter,
-            "text": format!("stub message {} from {}", counter, room_name),
-        });
-        let mut guard = rooms.lock().await;
-        if let Some(state) = guard.get_mut(&room_name) {
-            state.push(msg);
         }
     }
 }
@@ -181,19 +198,18 @@ async fn dispatch(req: Request, rooms: &SharedRooms) -> Response {
         }
 
         Request::Send { room, payload } => {
-            // TODO: Forward to the real connector's send/intent channel once
-            // connectors are wired in. Currently echoes the payload back as a
-            // received message so the round-trip can be tested end-to-end.
-            let mut guard = rooms.lock().await;
-            match guard.get_mut(&room) {
+            let guard = rooms.lock().await;
+            match guard.get(&room) {
                 None => Response::error(format!("room not found: {room}")),
-                Some(state) => {
-                    state.push(serde_json::json!({
-                        "echo": true,
-                        "payload": payload,
-                    }));
-                    Response::sent()
-                }
+                Some(state) => match &state.handle {
+                    Some(handle) => {
+                        let _ = handle.tx.send(payload);
+                        Response::sent()
+                    }
+                    None => Response::error(format!(
+                        "room '{room}' has no active connector"
+                    )),
+                },
             }
         }
 

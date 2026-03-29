@@ -77,10 +77,10 @@ impl ApiReactions {
             ("eyes", self.eyes),
         ];
         for (key, val) in fields {
-            if let Some(count) = val {
-                if count > 0 {
-                    map.insert(key.to_string(), count);
-                }
+            if let Some(count) = val
+                && count > 0
+            {
+                map.insert(key.to_string(), count);
             }
         }
         map
@@ -179,8 +179,8 @@ impl Transport for GithubTransport {
 
     async fn send(&mut self, data: &[u8]) -> Result<(), Self::Error> {
         let wire: ClientWire<GithubIntent> = serde_json::from_slice(data)?;
-        match wire {
-            ClientWire::Intent(intent) => match intent {
+        if let ClientWire::Intent(intent) = wire {
+            match intent {
                 GithubIntent::AddComment { body } => {
                     let url = format!(
                         "https://api.github.com/repos/{}/{}/issues/{}/comments",
@@ -238,9 +238,7 @@ impl Transport for GithubTransport {
                         self.issue_state = state.to_string();
                     }
                 }
-            },
-            // Auth, Ping, TransferRequest — not applicable for platform connectors.
-            _ => {}
+            }
         }
         Ok(())
     }
