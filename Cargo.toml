@@ -11,6 +11,7 @@ repository = "https://github.com/rhi-zone/interconnect"
 [workspace.dependencies]
 interconnect-core = { path = "crates/interconnect-core" }
 interconnect-client = { path = "crates/interconnect-client" }
+interconnect-connector-discord = { path = "crates/interconnect-connector-discord" }
 
 [profile.dev]
 debug = 0

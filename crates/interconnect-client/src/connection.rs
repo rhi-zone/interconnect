@@ -113,6 +113,16 @@ where
         self.transport.send(&to_json(&msg)?).await.map_err(Into::into)
     }
 
+    /// Create a connection where the platform has already handled authentication.
+    ///
+    /// Use this for platform connectors (Discord, Slack, etc.) where the
+    /// handshake is done natively by the platform SDK rather than via the
+    /// Interconnect wire protocol. The caller is responsible for fetching
+    /// the initial snapshot separately before constructing the connection.
+    pub fn established(transport: T, manifest: Manifest) -> Self {
+        Self { transport, manifest, _phantom: std::marker::PhantomData }
+    }
+
     /// The manifest received during the handshake.
     pub fn manifest(&self) -> &Manifest {
         &self.manifest

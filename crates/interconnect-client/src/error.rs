@@ -17,4 +17,8 @@ pub enum ClientError {
     /// The server sent a `ServerWire::Error` message.
     #[error("server error {code}: {message}")]
     Server { code: String, message: String },
+
+    /// A connector-specific error (e.g. from a platform API).
+    #[error("{0}")]
+    Other(Box<dyn std::error::Error + Send + Sync + 'static>),
 }
