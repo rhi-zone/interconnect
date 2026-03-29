@@ -53,12 +53,45 @@ Skip for now:
 - Raw email/IMAP — messy semantics, Zulip + mailing list cover the real needs
 - Notion — cloud-hosted, you don't own it, off-brand
 
-### Generalize docs language (2026-03-28)
+### Generalize docs language (2026-03-28) ✓ done
 
-Architecture, protocol, introduction docs still use game-heavy language (Tavern/Dungeon, physics, entities, player positions). Reframe:
-- Game examples are fine as *examples*, but shouldn't be the primary framing
-- Use generic terminology (room, authority, client) as the default
-- Keep game examples alongside social, process, and agent examples
+Architecture, protocol, introduction docs reframed. Game examples kept as one
+example among many (social, process, agent). Generic terminology (room,
+authority, client) is now the default.
 
 ## Backlog
+
+### More platform connectors
+
+Use Matrix bridge implementations as reference for platform quirks.
+
+7. **Telegram** (`interconnect-connector-telegram`) ✓ done — Bot API via
+   reqwest. Long-poll `getUpdates`, `sendMessage`. `connect(bot_token, chat_id)`.
+
+8. **Matrix** (`interconnect-connector-matrix`) ✓ done — Client-Server API via
+   reqwest. Long-poll `/sync`, `PUT /send`. `connect(homeserver, access_token, room_id)`.
+
+9. **IRC** (`interconnect-connector-irc`) ✓ done — plain TCP, RFC 1459.
+   `connect(server, port, nick, channel)`. Auto-PONG.
+
+10. **GitHub** (`interconnect-connector-github`) — Issues/PRs/Discussions as
+    rooms. REST API + webhooks. Snapshot = comment thread. Intents: AddComment,
+    React, Close. Prior art: utteranc.es. Reference: matrix-github.
+
+11. **WhatsApp** (`interconnect-connector-whatsapp`) — unofficial protocol via
+    `whatsmeow` (Go) or similar Rust port. Reference: mautrix-whatsapp. Risk:
+    account ban policy; implement with care.
+
+12. **iMessage** (`interconnect-connector-imessage`) — requires Mac relay
+    (BlueBubbles or similar). Reference: matrix-imessage. High setup friction;
+    low priority unless relay story improves.
+
+13. **Signal** (`interconnect-connector-signal`) — `signal-cli` subprocess or
+    native Rust via `libsignal`. Reference: mautrix-signal. E2EE complicates
+    snapshot model.
+
+Skip for now:
+- Raw email/IMAP — messy semantics, Zulip + mailing list cover the real needs
+- Notion — cloud-owned, off-brand
+- RSS — read-only (no intents); trivial but low value
 
