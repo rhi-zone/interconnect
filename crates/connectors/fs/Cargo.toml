@@ -7,8 +7,8 @@ repository.workspace = true
 description = "Filesystem connector for the Interconnect protocol"
 
 [dependencies]
-interconnect-core = { path = "../interconnect-core" }
-interconnect-client = { path = "../interconnect-client" }
+interconnect-core.workspace = true
+interconnect-client.workspace = true
 notify = "6"
 walkdir = "2"
 tokio = { version = "1", features = ["fs", "rt"] }
