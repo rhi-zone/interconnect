@@ -20,4 +20,10 @@ features:
     details: Clients send intent, authorities compute results. Never trust client state.
   - title: Graceful Degradation
     details: When authorities go offline, static room data remains. Ghost mode, not void.
+  - title: Daemon + CLI
+    details: A persistent daemon holds room connections. Short-lived CLI commands and AI assistant hooks talk to it over a Unix socket.
+    link: /daemon
+  - title: Agent Orchestration
+    details: Wire Claude Code, Gemini CLI, or any AI assistant into rooms using lifecycle hooks. Messages in, responses out — routing is outside the assistant's concern.
+    link: /agent-orchestration
 ---
