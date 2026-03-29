@@ -1,0 +1,16 @@
+[package]
+name = "interconnect-connector-sqlite"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "SQLite connector for the Interconnect protocol"
+
+[dependencies]
+interconnect-core.workspace = true
+interconnect-client.workspace = true
+rusqlite = { version = "0.32", features = ["bundled"] }
+tokio = { version = "1", features = ["time", "rt"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+thiserror = "2"

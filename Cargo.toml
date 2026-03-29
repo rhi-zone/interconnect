@@ -22,6 +22,7 @@ interconnect-connector-matrix = { path = "crates/connectors/interconnect-connect
 interconnect-connector-whatsapp = { path = "crates/connectors/interconnect-connector-whatsapp" }
 interconnect-connector-signal = { path = "crates/connectors/interconnect-connector-signal" }
 interconnect-connector-github = { path = "crates/connectors/interconnect-connector-github" }
+interconnect-connector-sqlite = { path = "crates/connectors/interconnect-connector-sqlite" }
 
 [profile.dev]
 debug = 0
