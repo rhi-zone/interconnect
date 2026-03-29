@@ -49,6 +49,10 @@ presents the platform as an Interconnect room. In priority order:
 6. **Obsidian** (`interconnect-connector-obsidian`) — FS variant with vault
    semantics (backlinks, tags). Uses Obsidian's local REST plugin. Low priority.
 
+14. **Webchat** (`examples/webchat`) ✓ done — axum HTTP+WebSocket server,
+    vanilla JS browser client, full Interconnect handshake. `cargo run -p
+    interconnect-example-webchat` → open http://localhost:3030.
+
 Skip for now:
 - Raw email/IMAP — messy semantics, Zulip + mailing list cover the real needs
 - Notion — cloud-hosted, you don't own it, off-brand
@@ -102,7 +106,7 @@ Two modes:
 **Generic mode** (done) — `connect(path, table)`. Any schema, poll for changes
 via `COUNT(*)/MAX(rowid)`. Intents: Execute/Insert/Delete.
 
-**Chat log mode** (TODO) — `connect_chat(path, config)`. Owned schema, manages
+**Chat log mode** (done) — `connect_chat(path, config)`. Owned schema, manages
 a `messages` table. Each connector maps into it via a user-defined column
 mapping in `interconnect.toml`:
 
