@@ -2,13 +2,11 @@
 
 ## Priority
 
-### Generalize protocol types (2026-03-28)
+### Generalize protocol types (2026-03-28) ✓ done
 
-The core protocol types are game-flavored. They need to be domain-agnostic:
-- `Intent` enum has `Move { direction }`, `Interact { target: EntityId }`, `UseItem` — should be `Intent<T>` where the room defines T
-- `Snapshot` has `entities: Vec<EntityState>` — should be `Snapshot<T>` where the authority defines what state looks like
-- `Manifest` has `physics_config: PhysicsConfig`, `allowed_items` — should carry room-defined capabilities/requirements
-- Keep game-specific types as one example implementation, not the protocol definition
+Core was already generic: `ClientWire<I>`, `ServerWire<S>`, `Authority` with
+associated types, `Manifest.metadata: serde_json::Value`. Game-specific types
+exist only in `examples/game/`. Nothing to change.
 
 ### Transport trait (2026-03-29) ✓ done
 
