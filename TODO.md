@@ -133,7 +133,7 @@ raw       = { path = "*",                   type = "json" }
   content) goes in the `raw` JSON column — nothing lost, common fields
   queryable cross-platform.
 
-### Daemon + Claude Code integration (`interconnect-daemon`) ✓ done (infrastructure)
+### Daemon + Claude Code integration (`interconnect-daemon`) ✓ done
 
 A persistent daemon that owns long-lived room connections and exposes a
 blocking CLI. Enables `claude -p` to participate in rooms interactively.
