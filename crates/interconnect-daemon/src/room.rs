@@ -188,6 +188,17 @@ async fn spawn_sqlite(
     config: &RoomConfig,
     push_tx: mpsc::UnboundedSender<serde_json::Value>,
 ) -> Result<RoomHandle, RoomError> {
+    if config.options.get("chat_log").is_some() {
+        spawn_sqlite_chat(config, push_tx).await
+    } else {
+        spawn_sqlite_generic(config, push_tx).await
+    }
+}
+
+async fn spawn_sqlite_generic(
+    config: &RoomConfig,
+    push_tx: mpsc::UnboundedSender<serde_json::Value>,
+) -> Result<RoomHandle, RoomError> {
     #[derive(Deserialize)]
     struct Opts {
         path: String,
@@ -225,6 +236,71 @@ async fn spawn_sqlite(
                     match intent {
                         Some(payload) => {
                             if let Ok(intent) = serde_json::from_value(payload) {
+                                let _ = conn.send_intent(intent).await;
+                            }
+                        }
+                        None => break,
+                    }
+                }
+            }
+        }
+    });
+
+    Ok(RoomHandle { tx: intent_tx })
+}
+
+async fn spawn_sqlite_chat(
+    config: &RoomConfig,
+    push_tx: mpsc::UnboundedSender<serde_json::Value>,
+) -> Result<RoomHandle, RoomError> {
+    #[derive(Deserialize)]
+    struct Opts {
+        path: String,
+    }
+    let opts: Opts = parse_opts(config)?;
+
+    let chat_log_value = config.options.get("chat_log").cloned().unwrap_or(serde_json::Value::Object(Default::default()));
+    let chat_config = if chat_log_value.get("columns").is_some() {
+        serde_json::from_value::<interconnect_connector_sqlite::ChatLogConfig>(chat_log_value)
+            .map_err(|e| RoomError::BadOptions {
+                connector: config.connector.clone(),
+                field: "chat_log".into(),
+                source: e,
+            })?
+    } else {
+        interconnect_connector_sqlite::ChatLogConfig::chat_default()
+    };
+
+    let (mut conn, snapshot) =
+        interconnect_connector_sqlite::connect_chat(opts.path, chat_config)
+            .await
+            .map_err(|e| RoomError::Connect(e.to_string()))?;
+
+    let _ = push_tx.send(
+        serde_json::to_value(&snapshot).unwrap_or(serde_json::Value::Null),
+    );
+
+    let (intent_tx, mut intent_rx) = mpsc::unbounded_channel::<serde_json::Value>();
+
+    tokio::spawn(async move {
+        loop {
+            tokio::select! {
+                msg = conn.recv() => {
+                    match msg {
+                        Ok(Some(ServerWire::Snapshot { data, .. })) => {
+                            let _ = push_tx.send(
+                                serde_json::to_value(&data).unwrap_or(serde_json::Value::Null),
+                            );
+                        }
+                        Ok(Some(_)) => {}
+                        Ok(None) => break,
+                        Err(e) => { eprintln!("sqlite chat room error: {e}"); break; }
+                    }
+                }
+                intent = intent_rx.recv() => {
+                    match intent {
+                        Some(payload) => {
+                            if let Ok(intent) = serde_json::from_value::<interconnect_connector_sqlite::ChatIntent>(payload) {
                                 let _ = conn.send_intent(intent).await;
                             }
                         }
