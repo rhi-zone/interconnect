@@ -35,8 +35,26 @@ impl ClaudePreset {
         let stop_cmd =
             r#"interconnect send "$INTERCONNECT_REPLY_TO" '{"type":"stop"}' 2>/dev/null || true"#;
 
+        // PreToolUse / UserPromptSubmit: inject any pending messages from the
+        // reply-to room into Claude's context. Hook stdout is shown to Claude
+        // before the tool call or prompt is processed. If there are no pending
+        // messages the command prints nothing and Claude proceeds normally.
+        let inject_cmd =
+            r#"interconnect recv --nowait "$INTERCONNECT_REPLY_TO" 2>/dev/null || true"#;
+
         serde_json::json!({
             "hooks": {
+                "PreToolUse": [
+                    {
+                        "matcher": "",
+                        "hooks": [
+                            {
+                                "type": "command",
+                                "command": inject_cmd
+                            }
+                        ]
+                    }
+                ],
                 "PostToolUse": [
                     {
                         "matcher": "",
@@ -44,6 +62,17 @@ impl ClaudePreset {
                             {
                                 "type": "command",
                                 "command": post_tool_use_cmd
+                            }
+                        ]
+                    }
+                ],
+                "UserPromptSubmit": [
+                    {
+                        "matcher": "",
+                        "hooks": [
+                            {
+                                "type": "command",
+                                "command": inject_cmd
                             }
                         ]
                     }

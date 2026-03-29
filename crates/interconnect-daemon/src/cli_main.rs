@@ -6,6 +6,7 @@ mod protocol;
 use std::path::PathBuf;
 
 use clap::{Parser, Subcommand};
+use tokio::io::AsyncWriteExt;
 
 use crate::protocol::{Request, Response};
 
@@ -51,6 +52,14 @@ enum Command {
         /// Path to interconnect.toml (default: ./interconnect.toml).
         #[arg(long, default_value = "interconnect.toml")]
         config: PathBuf,
+    },
+    /// Block on a room and invoke a command whenever a message arrives.
+    Watch {
+        room: String,
+        /// Shell command to run for each message. The message JSON is piped to
+        /// the command's stdin. INTERCONNECT_REPLY_TO is set to the room name.
+        #[arg(long)]
+        exec: String,
     },
 }
 
@@ -99,9 +108,54 @@ async fn main() -> anyhow::Result<()> {
             let resp = cli::send_request(&socket_path, &req).await?;
             print_response(resp);
         }
+
+        Command::Watch { room, exec } => {
+            handle_watch(&socket_path, &room, &exec).await?;
+        }
     }
 
     Ok(())
+}
+
+async fn handle_watch(
+    socket_path: &PathBuf,
+    room: &str,
+    exec: &str,
+) -> anyhow::Result<()> {
+    loop {
+        let req = Request::Recv {
+            room: room.to_owned(),
+            block: true,
+        };
+        let resp = cli::send_request(socket_path, &req).await?;
+
+        let messages = match resp {
+            Response::Messages { messages, .. } => messages,
+            Response::Error { error, .. } => {
+                anyhow::bail!("daemon error: {error}");
+            }
+            other => {
+                anyhow::bail!(
+                    "unexpected response: {}",
+                    serde_json::to_string(&other).unwrap_or_default()
+                );
+            }
+        };
+
+        for msg in messages {
+            let msg_json = serde_json::to_string(&msg)?;
+            let mut child = tokio::process::Command::new("sh")
+                .arg("-c")
+                .arg(exec)
+                .env("INTERCONNECT_REPLY_TO", room)
+                .stdin(std::process::Stdio::piped())
+                .spawn()?;
+            if let Some(mut stdin) = child.stdin.take() {
+                let _ = stdin.write_all(msg_json.as_bytes()).await;
+            }
+            child.wait().await?;
+        }
+    }
 }
 
 fn handle_init(
