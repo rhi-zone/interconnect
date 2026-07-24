@@ -3,17 +3,19 @@ import { withMermaid } from 'vitepress-plugin-mermaid'
 
 export default withMermaid(
   defineConfig({
-    title: 'Interconnect',
+    title: 'interconnect',
     description: 'Federation protocol for persistent worlds',
 
     base: '/interconnect/',
+
+    srcExclude: ['**/CLAUDE.md'],
 
     themeConfig: {
       nav: [
         { text: 'Guide', link: '/introduction' },
         { text: 'Why Interconnect?', link: '/why-interconnect' },
         { text: 'Protocol', link: '/protocol' },
-        { text: 'Rhi', link: 'https://docs.rhi.zone/' },
+        { text: 'rhi', link: 'https://docs.rhi.zone/' },
       ],
 
       sidebar: [
